@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useHistory } from "react-router-dom";
+import DeleteMovieModal from "./DeleteMovieModal";
 
 import axios from "axios";
 
 const Movie = (props) => {
   const { addToFavorites } = props;
-
+  const [showModal, setShowModal] = useState(false);
   const [movie, setMovie] = useState("");
 
   const { id } = useParams();
@@ -23,6 +24,10 @@ const Movie = (props) => {
   }, [id]);
 
   const handleDeleteClick = () => {
+    setShowModal(true);
+  };
+
+  const deleteRequest = () => {
     axios
       .delete(`http://localhost:5000/api/movies/${id}`)
       .then((res) => {
@@ -32,6 +37,10 @@ const Movie = (props) => {
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  const handleCancel = () => {
+    setShowModal(false);
   };
 
   return (
@@ -72,23 +81,31 @@ const Movie = (props) => {
                 </div>
               </section>
 
-              <section>
-                <span className="m-2 btn btn-dark">Favorite</span>
-                <Link
-                  to={`/movies/edit/${movie.id}`}
-                  className="m-2 btn btn-success"
-                >
-                  Edit
-                </Link>
-                <span className="delete">
-                  <input
-                    type="button"
-                    className="m-2 btn btn-danger"
-                    value="Delete"
-                    onClick={handleDeleteClick}
-                  />
-                </span>
-              </section>
+              {!showModal ? (
+                <section>
+                  <span className="m-2 btn btn-dark">Favorite</span>
+                  <Link
+                    to={`/movies/edit/${movie.id}`}
+                    className="m-2 btn btn-success"
+                  >
+                    Edit
+                  </Link>
+
+                  <span className="delete">
+                    <input
+                      type="button"
+                      className="m-2 btn btn-danger"
+                      value="Delete"
+                      onClick={handleDeleteClick}
+                    />
+                  </span>
+                </section>
+              ) : (
+                <DeleteMovieModal
+                  continueFunction={deleteRequest}
+                  cancelFunction={handleCancel}
+                />
+              )}
             </div>
           </div>
         </div>
